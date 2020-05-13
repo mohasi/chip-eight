@@ -14,6 +14,10 @@ namespace ChipEight {
         Position = new Vector2f(100, 100)
       };
 
+      var sys = new System();
+      sys.Memory.Set(1, 0xFF);
+      sys.Registers.V[0xF] = 100;
+
       while (window.IsOpen) {
         window.DispatchEvents();
         window.Clear();
