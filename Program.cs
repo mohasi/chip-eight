@@ -15,8 +15,9 @@ namespace ChipEight {
       };
 
       var sys = new System();
-      sys.Memory.Set(1, 0xFF);
-      sys.Registers.V[0xF] = 100;
+      sys.Keyboard.Down('A');
+      var a = sys.Keyboard.IsKeyDown(9);
+      var b = sys.Keyboard.IsKeyDown(10);
 
       while (window.IsOpen) {
         window.DispatchEvents();
