@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-
-namespace ChipEight {
+﻿namespace ChipEight {
   class Stack {
     private readonly ushort[] _stack = new ushort[Consts.StackDepth];
 

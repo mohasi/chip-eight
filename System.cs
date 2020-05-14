@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ChipEight {
+﻿namespace ChipEight {
   class System {
     public Memory Memory { get; private set; }
     public Registers Registers { get; private set; }

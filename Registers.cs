@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-
-namespace ChipEight {
+﻿namespace ChipEight {
   class Registers {
     public byte[] V { get; set; } = new byte[Consts.GeneralRegisterCount];
     public ushort I { get; set; }
