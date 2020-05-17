@@ -1,6 +1,7 @@
 ﻿using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
+using System.Diagnostics;
 using static SFML.Window.Keyboard;
 
 namespace ChipEight {
@@ -63,11 +64,25 @@ namespace ChipEight {
       sys.DrawSprite(60, 10, 5);
       sys.DrawSprite(63, 14, 5);
 
+      // ready made pixel
       var pixelSize = new Vector2f(Consts.Scale, Consts.Scale);
       var pixel = new RectangleShape {
         Size = pixelSize,
         FillColor = Color.White
       };
+
+      #region FPS
+      var fpsText = new Text("FPS", new Font("consola.ttf")) {
+        CharacterSize = 22,
+        FillColor = Color.Green,
+        Style = Text.Styles.Regular,
+        Position = new Vector2f(10, 4)
+      };
+
+      var frameCount = 0L;
+      var clock = new Stopwatch();
+      clock.Start();
+      #endregion
 
       while (window.IsOpen) {
         window.DispatchEvents();
@@ -84,7 +99,10 @@ namespace ChipEight {
           }
         }
 
+        window.Draw(fpsText);
         window.Display();
+
+        fpsText.DisplayedString = $"FPS:{(int)(frameCount++ / clock.Elapsed.TotalSeconds)}";
       }
     }
   }
