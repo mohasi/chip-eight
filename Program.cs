@@ -53,11 +53,15 @@ namespace ChipEight {
       #endregion
 
       // stripes
-      for (int x = 0; x < Consts.Width; x += 2) {
-        for (int y = 0; y < Consts.Height; y++) {
-          sys.Screen.Set(x, y);
-        }
-      }
+      //for (int x = 0; x < Consts.Width; x += 2) {
+      //  for (int y = 0; y < Consts.Height; y++) {
+      //    sys.Screen.Set(x, y);
+      //  }
+      //}
+
+      // overlapping & wrapping sprites
+      sys.DrawSprite(60, 10, 5);
+      sys.DrawSprite(63, 14, 5);
 
       var pixelSize = new Vector2f(Consts.Scale, Consts.Scale);
       var pixel = new RectangleShape {
