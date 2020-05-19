@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace ChipEight {
   class System {
@@ -37,6 +38,14 @@ namespace ChipEight {
 
       // VF = 1 if pixels collided else it should be 0
       Registers.V[0xF] = collision ? (byte)1 : (byte)0;
+    }
+
+    public void Beep() {
+      var msToBeep = (int)Math.Ceiling(Registers.ST * Consts.MillisecondsInOneHertz);
+      Registers.ST = 0;
+      Task.Run(() => {
+        Console.Beep(Consts.SoundFrequency, msToBeep);
+      });
     }
   }
 }

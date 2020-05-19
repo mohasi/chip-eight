@@ -1,6 +1,7 @@
 ﻿using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
+using System;
 using System.Diagnostics;
 using static SFML.Window.Keyboard;
 
@@ -32,6 +33,7 @@ namespace ChipEight {
       #endregion
 
       using var window = new RenderWindow(new VideoMode(Consts.ScaledWidth, Consts.ScaledHeight), Consts.Title);
+      window.SetFramerateLimit(60);
 
       #region EVENT HANDLING
       window.KeyPressed += (s, e) => {
@@ -52,13 +54,6 @@ namespace ChipEight {
 
       window.Closed += (s, e) => window.Close();
       #endregion
-
-      // stripes
-      //for (int x = 0; x < Consts.Width; x += 2) {
-      //  for (int y = 0; y < Consts.Height; y++) {
-      //    sys.Screen.Set(x, y);
-      //  }
-      //}
 
       // overlapping & wrapping sprites
       sys.DrawSprite(60, 10, 5);
@@ -84,6 +79,8 @@ namespace ChipEight {
       clock.Start();
       #endregion
 
+      sys.Registers.ST = 120; // beep for 2 secs;
+
       while (window.IsOpen) {
         window.DispatchEvents();
         window.Clear();
@@ -102,7 +99,17 @@ namespace ChipEight {
         window.Draw(fpsText);
         window.Display();
 
-        fpsText.DisplayedString = $"FPS:{(int)(frameCount++ / clock.Elapsed.TotalSeconds)}";
+        // update fps
+        fpsText.DisplayedString = $"FPS:{Math.Ceiling(frameCount++ / clock.Elapsed.TotalSeconds)}";
+
+        // count down delay timer (relies on 60Hz rate)
+        if (sys.Registers.DT > 0)
+          sys.Registers.DT--;
+
+        // count down sound timer (relies on 60Hz rate)
+        if (sys.Registers.ST > 0) {
+          sys.Beep(); // f&f beep in bg
+        }
       }
     }
   }
