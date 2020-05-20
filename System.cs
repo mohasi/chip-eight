@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace ChipEight {
@@ -46,6 +47,11 @@ namespace ChipEight {
       Task.Run(() => {
         Console.Beep(Consts.SoundFrequency, msToBeep);
       });
+    }
+
+    public async Task Load(string filePath) {
+      var programBytes = await File.ReadAllBytesAsync(filePath);
+      Memory.Set(512, programBytes);
     }
   }
 }

@@ -3,12 +3,14 @@ using SFML.System;
 using SFML.Window;
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using static SFML.Window.Keyboard;
 
 namespace ChipEight {
   class Program {
-    static void Main(string[] args) {
+    static async Task Main(string[] args) {
       var sys = new System();
+      await sys.Load("BRIX");
 
       #region KEYMAP
       // TODO: load from file
@@ -55,10 +57,6 @@ namespace ChipEight {
       window.Closed += (s, e) => window.Close();
       #endregion
 
-      // overlapping & wrapping sprites
-      sys.DrawSprite(60, 10, 5);
-      sys.DrawSprite(63, 14, 5);
-
       // ready made pixel
       var pixelSize = new Vector2f(Consts.Scale, Consts.Scale);
       var pixel = new RectangleShape {
@@ -78,8 +76,6 @@ namespace ChipEight {
       var clock = new Stopwatch();
       clock.Start();
       #endregion
-
-      sys.Registers.ST = 120; // beep for 2 secs;
 
       while (window.IsOpen) {
         window.DispatchEvents();

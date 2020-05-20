@@ -10,6 +10,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="BRIX">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="consola.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -34,5 +34,9 @@ namespace ChipEight {
     public void Set(int index, byte value) {
       _memory[index] = value;
     }
+
+    public void Set(int index, byte[] values) {
+      Array.Copy(values, 0, _memory, index, values.Length);
+    }
   }
 }
