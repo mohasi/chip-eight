@@ -10,10 +10,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="BRIX">
+    <None Update="Games\BRIX">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="consola.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Games\INVADERS">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

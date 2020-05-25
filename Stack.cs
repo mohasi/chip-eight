@@ -5,11 +5,11 @@
     public byte SP { get; private set; }
 
     public void Push(ushort value) {
-      _stack[++SP] = value;
+      _stack[SP++] = value;
     }
 
     public ushort Pop() {
-      return _stack[SP--];
+      return _stack[--SP];
     }
   }
 }

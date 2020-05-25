@@ -3,16 +3,22 @@ using SFML.System;
 using SFML.Window;
 using System;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using static SFML.Window.Keyboard;
 
 namespace ChipEight {
   class Program {
     static async Task Main(string[] args) {
+      // init system
       var sys = new System();
-      await sys.Load("BRIX");
+      await sys.Load("Games/BRIX");
 
-      #region KEYMAP
+      // create window
+      using var window = new RenderWindow(new VideoMode(Consts.ScaledWidth, Consts.ScaledHeight), Consts.Title);
+      window.SetVerticalSyncEnabled(true);
+
+      #region KEYMAP & EVENT HANDLING
       // TODO: load from file
       var keyMappings = new[] {
         Key.Num0,
@@ -32,12 +38,7 @@ namespace ChipEight {
         Key.E,
         Key.F
       };
-      #endregion
 
-      using var window = new RenderWindow(new VideoMode(Consts.ScaledWidth, Consts.ScaledHeight), Consts.Title);
-      window.SetFramerateLimit(60);
-
-      #region EVENT HANDLING
       window.KeyPressed += (s, e) => {
         for (var i = 0; i < keyMappings.Length; i++) {
           if (keyMappings[i] == e.Code) {
@@ -57,11 +58,14 @@ namespace ChipEight {
       window.Closed += (s, e) => window.Close();
       #endregion
 
+      var bgColour = new Color(143, 145, 133);
+      var fgColour = new Color(17, 29, 43);
+
       // ready made pixel
       var pixelSize = new Vector2f(Consts.Scale, Consts.Scale);
       var pixel = new RectangleShape {
         Size = pixelSize,
-        FillColor = Color.White
+        FillColor = fgColour
       };
 
       #region FPS
@@ -77,9 +81,30 @@ namespace ChipEight {
       clock.Start();
       #endregion
 
+      // cpu loop in another thread
+      _ = Task.Run(() => {
+        var ticksPerCycle = TimeSpan.FromTicks(Consts.TicksPerCycle);
+        while (true) {
+          sys.Execute();
+
+          // count down delay timer (relies on 60Hz rate)
+          if (sys.Registers.DT > 0)
+            sys.Registers.DT--;
+
+          // count down sound timer (relies on 60Hz rate)
+          if (sys.Registers.ST > 0) {
+            sys.Beep(); // f&f beep in bg
+          }
+
+          // control speed of cpu, which should be about 9 cycles per frame
+          Thread.Sleep(ticksPerCycle);
+        }
+      });
+
+      // gfx loop
       while (window.IsOpen) {
         window.DispatchEvents();
-        window.Clear();
+        window.Clear(bgColour);
 
         // draw pixels
         // TODO: experiment array -> image for faster draw?
@@ -97,15 +122,6 @@ namespace ChipEight {
 
         // update fps
         fpsText.DisplayedString = $"FPS:{Math.Ceiling(frameCount++ / clock.Elapsed.TotalSeconds)}";
-
-        // count down delay timer (relies on 60Hz rate)
-        if (sys.Registers.DT > 0)
-          sys.Registers.DT--;
-
-        // count down sound timer (relies on 60Hz rate)
-        if (sys.Registers.ST > 0) {
-          sys.Beep(); // f&f beep in bg
-        }
       }
     }
   }

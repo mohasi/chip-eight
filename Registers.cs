@@ -2,8 +2,8 @@
   class Registers {
     public byte[] V { get; set; } = new byte[Consts.GeneralRegisterCount];
     public ushort I { get; set; }
-    public ushort DT { get; set; }
-    public ushort ST { get; set; }
+    public byte DT { get; set; }
+    public byte ST { get; set; }
     public ushort PC { get; set; }
   }
 }
