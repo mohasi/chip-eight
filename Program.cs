@@ -12,7 +12,7 @@ namespace ChipEight {
     static async Task Main(string[] args) {
       // init system
       var sys = new System();
-      await sys.Load("Games/BRIX");
+      await sys.Load("Games/PONG");
 
       // create window
       using var window = new RenderWindow(new VideoMode(Consts.ScaledWidth, Consts.ScaledHeight), Consts.Title);
