@@ -28,6 +28,6 @@ namespace ChipEight {
     public const int CpuClockSpeedHertz = 540;
     public const int CyclesPerFrame = CpuClockSpeedHertz / TargetSystemFrameRate;
     public const double MillisecondsPerCycle = MillisecondsPerFrame / CyclesPerFrame;
-    public const int TicksPerCycle = (int) (TimeSpan.TicksPerMillisecond * MillisecondsPerCycle);
+    public const int TicksPerCycle = (int)(TimeSpan.TicksPerMillisecond * MillisecondsPerCycle);
   }
 }

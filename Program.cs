@@ -12,7 +12,7 @@ namespace ChipEight {
     static async Task Main(string[] args) {
       // init system
       var sys = new System();
-      await sys.Load("Games/BRIX");
+      await sys.Load("Games/INVADERS");
 
       // create window
       using var window = new RenderWindow(new VideoMode(Consts.ScaledWidth, Consts.ScaledHeight), Consts.Title);
@@ -40,17 +40,17 @@ namespace ChipEight {
       };
 
       window.KeyPressed += (s, e) => {
-        for (var i = 0; i < keyMappings.Length; i++) {
+        for (byte i = 0; i < keyMappings.Length; i++) {
           if (keyMappings[i] == e.Code) {
-            sys.Keyboard.Down(i);
+            sys.Keyboard.Press(i);
           }
         }
       };
 
       window.KeyReleased += (s, e) => {
-        for (var i = 0; i < keyMappings.Length; i++) {
+        for (byte i = 0; i < keyMappings.Length; i++) {
           if (keyMappings[i] == e.Code) {
-            sys.Keyboard.Up(i);
+            sys.Keyboard.Release(i);
           }
         }
       };
@@ -82,10 +82,13 @@ namespace ChipEight {
       #endregion
 
       // cpu loop in another thread
-      _ = Task.Run(() => {
+      _ = Task.Run(async () => {
+        var sw = new Stopwatch();
+        sw.Start();
+
         var ticksPerCycle = TimeSpan.FromTicks(Consts.TicksPerCycle);
         while (true) {
-          sys.Execute();
+          await sys.Execute();
 
           // count down delay timer (relies on 60Hz rate)
           if (sys.Registers.DT > 0)
@@ -96,8 +99,12 @@ namespace ChipEight {
             sys.Beep(); // f&f beep in bg
           }
 
-          // control speed of cpu, which should be about 9 cycles per frame
-          Thread.Sleep(ticksPerCycle);
+          // control speed of cpu, each cpu cycle should take about 1.85ms (18518 ticks)
+          // if it takes less, then wait for the remaining period
+          var ticksToSleep = Consts.TicksPerCycle > sw.ElapsedTicks ? Consts.TicksPerCycle - sw.ElapsedTicks : 0;
+          Thread.Sleep(TimeSpan.FromTicks(ticksToSleep));
+          Debug.WriteLine($"cycle took: {sw.ElapsedTicks} ticks");
+          sw.Restart();
         }
       });
 

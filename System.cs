@@ -56,12 +56,10 @@ namespace ChipEight {
       Registers.PC = Consts.ProgramLoadAddress;
     }
 
-    public void Execute() {
+    public async Task Execute() {
       var highByte = Memory.Get(Registers.PC);
       var lowByte = Memory.Get(Registers.PC + 1);
       var opcode = new Opcode(highByte, lowByte);
-
-      //Debug.WriteLine($"{Registers.PC:X} - {opcode} - V0={Registers.V[0]:X} I={Registers.I:X}");
 
       #region PROCESS OPCODE
       // do not increment PC for jumps
@@ -169,12 +167,12 @@ namespace ChipEight {
         case 0xE:
           switch (opcode.LowByte) {
             case 0x9E: // SKP Vx (skip next instruction if key with the value of Vx is pressed)
-              if (Keyboard.IsKeyDown(Registers.V[opcode.X])) {
+              if (Keyboard.IsKeyPressed(Registers.V[opcode.X])) {
                 Registers.PC += 2;
               }
               break;
             case 0xA1: // ExA1 - SKNP Vx (skip next instruction if key with the value of Vx is not pressed)
-              if (!Keyboard.IsKeyDown(Registers.V[opcode.X])) {
+              if (!Keyboard.IsKeyPressed(Registers.V[opcode.X])) {
                 Registers.PC += 2;
               }
               break;
@@ -186,7 +184,8 @@ namespace ChipEight {
               Registers.V[opcode.X] = Registers.DT;
               break;
             case 0x0A: // Fx0A - LD Vx, K (wait for a key press, store the value of the key in Vx)
-              // do something...
+              var key = await Keyboard.WaitForKeyPressAsync();
+              Registers.V[opcode.X] = key;
               break;
             case 0x15: // Fx15 - LD DT, Vx (set delay timer = Vx)
               Registers.DT = Registers.V[opcode.X];
