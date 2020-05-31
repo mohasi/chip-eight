@@ -12,11 +12,11 @@ namespace ChipEight {
     static async Task Main(string[] args) {
       // init system
       var sys = new System();
-      await sys.Load("Games/INVADERS");
+      await sys.Load("Games/BRIX");
 
       // create window
       using var window = new RenderWindow(new VideoMode(Consts.ScaledWidth, Consts.ScaledHeight), Consts.Title);
-      window.SetVerticalSyncEnabled(true);
+      window.SetFramerateLimit(Consts.FrameRate);
 
       #region KEYMAP & EVENT HANDLING
       // TODO: load from file
@@ -101,9 +101,10 @@ namespace ChipEight {
 
           // control speed of cpu, each cpu cycle should take about 1.85ms (18518 ticks)
           // if it takes less, then wait for the remaining period
+          sw.Stop();
           var ticksToSleep = Consts.TicksPerCycle > sw.ElapsedTicks ? Consts.TicksPerCycle - sw.ElapsedTicks : 0;
+          // Debug.WriteLine($"cycle took: {sw.ElapsedTicks} ticks, sleeping {ticksToSleep} ticks");
           Thread.Sleep(TimeSpan.FromTicks(ticksToSleep));
-          Debug.WriteLine($"cycle took: {sw.ElapsedTicks} ticks");
           sw.Restart();
         }
       });

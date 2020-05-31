@@ -10,6 +10,7 @@ namespace ChipEight {
     public const int Scale = 15;
     public const int ScaledWidth = Width * Scale;
     public const int ScaledHeight = Height * Scale;
+    public const int FrameRate = 60;
 
     // memory related
     public const int MemorySize = 4096;
