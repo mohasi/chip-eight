@@ -56,7 +56,7 @@ namespace ChipEight {
       Registers.PC = Consts.ProgramLoadAddress;
     }
 
-    public async Task Execute() {
+    public void Execute() {
       var highByte = Memory.Get(Registers.PC);
       var lowByte = Memory.Get(Registers.PC + 1);
       var opcode = new Opcode(highByte, lowByte);
@@ -184,7 +184,7 @@ namespace ChipEight {
               Registers.V[opcode.X] = Registers.DT;
               break;
             case 0x0A: // Fx0A - LD Vx, K (wait for a key press, store the value of the key in Vx)
-              var key = await Keyboard.WaitForKeyPressAsync();
+              var key = Keyboard.WaitForKeyPressAsync().Result;
               Registers.V[opcode.X] = key;
               break;
             case 0x15: // Fx15 - LD DT, Vx (set delay timer = Vx)

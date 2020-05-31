@@ -82,13 +82,13 @@ namespace ChipEight {
       #endregion
 
       // cpu loop in another thread
-      _ = Task.Run(async () => {
+      _ = Task.Run(() => {
         var sw = new Stopwatch();
         sw.Start();
 
         var ticksPerCycle = TimeSpan.FromTicks(Consts.TicksPerCycle);
         while (true) {
-          await sys.Execute();
+          sys.Execute();
 
           // count down delay timer (relies on 60Hz rate)
           if (sys.Registers.DT > 0)
@@ -100,11 +100,16 @@ namespace ChipEight {
           }
 
           // control speed of cpu, each cpu cycle should take about 1.85ms (18518 ticks)
-          // if it takes less, then wait for the remaining period
-          sw.Stop();
+          // if it takes less, then wait for the remaining period before starting next cpu ccy.
           var ticksToSleep = Consts.TicksPerCycle > sw.ElapsedTicks ? Consts.TicksPerCycle - sw.ElapsedTicks : 0;
-          // Debug.WriteLine($"cycle took: {sw.ElapsedTicks} ticks, sleeping {ticksToSleep} ticks");
-          Thread.Sleep(TimeSpan.FromTicks(ticksToSleep));
+          sw.Restart();
+          while (true) {
+            Thread.SpinWait(1); // more accurate than Task.Delay() or Thread.Sleep()
+            if (sw.ElapsedTicks >= ticksToSleep) {
+              break;
+            }
+          }
+
           sw.Restart();
         }
       });
