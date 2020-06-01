@@ -5,7 +5,7 @@ A basic CHIP-8 emulator written in C#
 
 I tried to do a basic performance benchmark so that if I port this to `C/C++` I have something to compare with:
 
-```
+```cs
 var sw = new Stopwatch();
 sw.Start();
 
