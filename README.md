@@ -28,7 +28,8 @@ for (int x = 0; x < 10; x++) {
 
   Debug.WriteLine(sw.ElapsedMilliseconds);
   sw.Restart();
-}```
+}
+```
 
 Output:
 > 1161
