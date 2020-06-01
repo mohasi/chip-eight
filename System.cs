@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ChipEight {
@@ -11,13 +13,16 @@ namespace ChipEight {
     public Stack Stack { get; private set; }
     public Keyboard Keyboard { get; private set; }
     public Screen Screen { get; private set; }
+    public Sound Sound { get; set; }
     public bool IsWaitingForKey { get; set; }
+
     public System() {
       Memory = new Memory();
       Registers = new Registers();
       Stack = new Stack();
       Keyboard = new Keyboard();
       Screen = new Screen();
+      Sound = new Sound();
     }
 
     public bool DrawSprite(byte x, byte y, byte maxRows) {
@@ -42,18 +47,46 @@ namespace ChipEight {
       return collision;
     }
 
-    public void Beep() {
-      var msToBeep = (int)Math.Ceiling(Registers.ST * Consts.MillisecondsPerFrame);
-      Registers.ST = 0;
-      _ = Task.Run(() => {
-        Console.Beep(Consts.SoundFrequency, msToBeep);
-      });
-    }
+    public void Start(string filePath) {
+      Task.Run(() => {
+        // load game
+        var programBytes = File.ReadAllBytes(filePath);
+        Memory.Set(Consts.ProgramLoadAddress, programBytes);
+        Registers.PC = Consts.ProgramLoadAddress;
 
-    public async Task Load(string filePath) {
-      var programBytes = await File.ReadAllBytesAsync(filePath);
-      Memory.Set(Consts.ProgramLoadAddress, programBytes);
-      Registers.PC = Consts.ProgramLoadAddress;
+        // run game
+        var sw = new Stopwatch();
+        sw.Start();
+
+        var ticksPerCycle = TimeSpan.FromTicks(Consts.TicksPerCycle);
+        while (true) {
+          Execute();
+
+          // count down delay timer (relies on 60Hz rate)
+          if (Registers.DT > 0)
+            Registers.DT--;
+
+          // count down sound timer (relies on 60Hz rate)
+          if (Registers.ST > 0) {
+            var msToBeep = (int)Math.Ceiling(Registers.ST * Consts.MillisecondsPerFrame);
+            Registers.ST = 0;
+            Sound.Beep(msToBeep); // f&f beep in bg
+          }
+
+          // control speed of cpu, each cpu cycle should take about 1.85ms (18518 ticks)
+          // if it takes less, then wait for the remaining period before starting next cpu ccy.
+          var ticksToSleep = Consts.TicksPerCycle > sw.ElapsedTicks ? Consts.TicksPerCycle - sw.ElapsedTicks : 0;
+          sw.Restart();
+          while (true) {
+            Thread.SpinWait(1); // more accurate than Task.Delay() or Thread.Sleep()
+            if (sw.ElapsedTicks >= ticksToSleep) {
+              break;
+            }
+          }
+
+          sw.Restart();
+        }
+      });
     }
 
     public void Execute() {

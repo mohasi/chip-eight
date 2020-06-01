@@ -3,16 +3,13 @@ using SFML.System;
 using SFML.Window;
 using System;
 using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
 using static SFML.Window.Keyboard;
 
 namespace ChipEight {
   class Program {
-    static async Task Main(string[] args) {
+    static void Main(string[] args) {
       // init system
       var sys = new System();
-      await sys.Load("Games/PONG");
 
       // create window
       using var window = new RenderWindow(new VideoMode(Consts.ScaledWidth, Consts.ScaledHeight), Consts.Title);
@@ -81,38 +78,8 @@ namespace ChipEight {
       clock.Start();
       #endregion
 
-      // cpu loop in another thread
-      _ = Task.Run(() => {
-        var sw = new Stopwatch();
-        sw.Start();
-
-        var ticksPerCycle = TimeSpan.FromTicks(Consts.TicksPerCycle);
-        while (true) {
-          sys.Execute();
-
-          // count down delay timer (relies on 60Hz rate)
-          if (sys.Registers.DT > 0)
-            sys.Registers.DT--;
-
-          // count down sound timer (relies on 60Hz rate)
-          if (sys.Registers.ST > 0) {
-            sys.Beep(); // f&f beep in bg
-          }
-
-          // control speed of cpu, each cpu cycle should take about 1.85ms (18518 ticks)
-          // if it takes less, then wait for the remaining period before starting next cpu ccy.
-          var ticksToSleep = Consts.TicksPerCycle > sw.ElapsedTicks ? Consts.TicksPerCycle - sw.ElapsedTicks : 0;
-          sw.Restart();
-          while (true) {
-            Thread.SpinWait(1); // more accurate than Task.Delay() or Thread.Sleep()
-            if (sw.ElapsedTicks >= ticksToSleep) {
-              break;
-            }
-          }
-
-          sw.Restart();
-        }
-      });
+      // start running in another thread
+      sys.Start("Games/INVADERS");
 
       // gfx loop
       while (window.IsOpen) {
