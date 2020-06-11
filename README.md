@@ -1,7 +1,7 @@
 # Emulator
 A basic CHIP-8 emulator written in C#
 
-![alt text](https://github.com/mohasi/chip-eight/Emulator/demo.gif)
+![alt text](https://github.com/mohasi/chip-eight/blob/master/Emulator/demo.gif)
 
 I tried to do a basic performance benchmark so that if I port this to `C/C++` I have something to compare with:
 
